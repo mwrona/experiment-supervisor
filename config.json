@@ -1,0 +1,9 @@
+{
+  "experiment_id": "aaaa",
+  "lower_limit": [-30.0, -30.0],
+  "upper_limit": [30.0, 30.0],
+  "start_point": [0.0, 0.0],
+  "maxiter": 1000,
+  "dwell": 100,
+  "schedule": "boltzmann"
+}
