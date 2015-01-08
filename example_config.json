@@ -1,0 +1,13 @@
+{
+  "experiment_id": "",
+  "lower_limit": [-30.0, -30.0],
+  "upper_limit": [30.0, 30.0],
+  "start_point": [0.0, 0.0],
+  "maxiter": 0,
+  "dwell": 0,
+  "schedule": "boltzmann",
+  "user": "",
+  "password": "",
+  "address" : "https://localhost:3001",
+  "parameters_ids" : ["c___g___x", "c___g___y"]
+}

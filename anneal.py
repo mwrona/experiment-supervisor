@@ -1,12 +1,12 @@
 import scipy.optimize as scopt
-import scalarmapi
 import json
 import draw
+from scalarmapi import Scalarm
 
 
-def call_scalarm(experiment_id, x):
-    scalarmapi.schedule_point(experiment_id, x)
-    return scalarmapi.get_result(experiment_id, x)
+def call_scalarm(x):
+    scalarm.schedule_point(x)
+    return scalarm.get_result(x)
 
 
 def to_csv(data):
@@ -16,13 +16,18 @@ def to_csv(data):
         s += str(l)
     return s
 
+
 if __name__ == "__main__":
     config_file = open('config.json')
     config = json.load(config_file)
     config_file.close()
+    scalarm = Scalarm(config['user'],
+                      config['password'],
+                      config['experiment_id'],
+                      config["address"],
+                      config["parameters_ids"])
 
-    f = lambda x: call_scalarm(config['experiment_id'], x)
-    res = scopt.anneal(func=f,
+    res = scopt.anneal(func=call_scalarm,
                        x0=config['start_point'],
                        full_output=True,
                        schedule=config['schedule'],
@@ -32,4 +37,4 @@ if __name__ == "__main__":
                        dwell=config['dwell'])
     print json.dumps({'result': res[1], 'values': to_csv(res[0])})
 
-    draw.draw(f, config['lower_limit'], config['upper_limit'], "fun", res[0][0], res[0][1], res[1])
+    draw.draw(call_scalarm, config['lower_limit'], config['upper_limit'], "fun", res[0][0], res[0][1], res[1])
