@@ -4,8 +4,9 @@ from scalarmapi import Scalarm
 
 
 def call_scalarm(x):
-    scalarm.schedule_point(x)
     print 'schedule_point'
+    scalarm.schedule_point(x)
+    print 'get_result'
     return scalarm.get_result(x)
 
 
@@ -36,8 +37,9 @@ if __name__ == "__main__":
                        maxiter=config['maxiter'],
                        dwell=config['dwell'])
 
-    scalarm.mark_as_complete()
     print 'mark_as_complete'
+    scalarm.mark_as_complete()
+    print 'set_result'
     scalarm.set_result({'result': res[1], 'values': to_csv(res[0])})
 
 
