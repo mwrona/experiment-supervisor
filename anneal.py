@@ -1,11 +1,11 @@
 import scipy.optimize as scopt
 import json
-import draw
 from scalarmapi import Scalarm
 
 
 def call_scalarm(x):
     scalarm.schedule_point(x)
+    print 'schedule_point'
     return scalarm.get_result(x)
 
 
@@ -35,6 +35,9 @@ if __name__ == "__main__":
                        upper=config['upper_limit'],
                        maxiter=config['maxiter'],
                        dwell=config['dwell'])
-    print json.dumps({'result': res[1], 'values': to_csv(res[0])})
 
-    draw.draw(call_scalarm, config['lower_limit'], config['upper_limit'], "fun", res[0][0], res[0][1], res[1])
+    scalarm.mark_as_complete()
+    print 'mark_as_complete'
+    scalarm.set_result({'result': res[1], 'values': to_csv(res[0])})
+
+
