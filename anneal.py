@@ -1,5 +1,6 @@
 import scipy.optimize as scopt
 import json
+import sys
 from scalarmapi import Scalarm
 
 
@@ -19,7 +20,10 @@ def to_csv(data):
 
 
 if __name__ == "__main__":
-    config_file = open('config.json')
+    if len(sys.argv) < 2:
+        config_file = open('config.json')
+    else:
+        config_file = open(sys.argv[1])
     config = json.load(config_file)
     config_file.close()
     scalarm = Scalarm(config['user'],
