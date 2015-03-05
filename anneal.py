@@ -9,6 +9,7 @@ def call_scalarm(x):
     scalarm.schedule_point(x)
     print 'get_result'
     return scalarm.get_result(x)
+    sys.stdout.flush()
 
 
 def to_csv(data):

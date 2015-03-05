@@ -4,6 +4,8 @@ import requests
 from requests.auth import HTTPBasicAuth
 from requests.exceptions import Timeout
 import time
+import signal
+import sys
 
 f1 = lambda x: (4 - 2.1 * x[0] ** 2 + (x[0] ** 4) / 3) * x[0] ** 2 + x[0] * x[1] + (-4 + 4 * x[1] ** 2) * x[1] ** 2
 
@@ -18,6 +20,7 @@ class Scalarm:
         self.experiment_id = experiment_id
         self.address = address
         self.parameters_ids = parameters_ids
+        signal.signal(signal.SIGUSR1, lambda signal, frame: None)
 
     def schedule_point(self, params):
         params_dict = {}
@@ -41,7 +44,8 @@ class Scalarm:
             decoded_result = json.loads(r.text)
             if decoded_result["status"] == "error":
                 print decoded_result["message"]
-                time.sleep(1)
+                sys.stdout.flush()
+                signal.pause()
                 continue
             elif decoded_result["status"] == "ok":
                 return decoded_result["result"]["product"]
