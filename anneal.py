@@ -42,8 +42,6 @@ if __name__ == "__main__":
                        dwell=config['dwell'])
 
     print 'mark_as_complete'
-    scalarm.mark_as_complete()
-    print 'set_result'
-    scalarm.set_result({'result': res[1], 'values': to_csv(res[0])})
+    scalarm.mark_as_complete({'result': res[1], 'values': to_csv(res[0])})
 
 

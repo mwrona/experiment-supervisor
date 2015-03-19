@@ -46,13 +46,8 @@ class Scalarm:
             elif decoded_result["status"] == "ok":
                 return decoded_result["result"]["product"]
 
-    def mark_as_complete(self):
-        r = requests.post("%s/experiments/%s/mark_as_complete" % (self.address, self.experiment_id),
-                          auth=HTTPBasicAuth(self.user, self.password))
-        print r.text
-
-    def set_result(self, result):
-        r = requests.post("%s/experiments/%s/set_result.json" % (self.address, self.experiment_id),
+    def mark_as_complete(self, result):
+        r = requests.post("%s/experiments/%s/mark_as_complete.json" % (self.address, self.experiment_id),
                           auth=HTTPBasicAuth(self.user, self.password),
                           params={'result': json.dumps(result)})
         print r.text
