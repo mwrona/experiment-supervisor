@@ -8,6 +8,7 @@
   "schedule": "boltzmann",
   "user": "",
   "password": "",
-  "address" : "https://localhost:3001",
+  "http_schema": "https",
+  "address" : "localhost:3001",
   "parameters_ids" : ["c___g___x", "c___g___y"]
 }

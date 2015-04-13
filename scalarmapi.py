@@ -22,12 +22,13 @@ def get_handler(cv):
     return handler
 
 class Scalarm:
-    def __init__(self, user, password, experiment_id, address, parameters_ids):
+    def __init__(self, user, password, experiment_id, http_schema, address, parameters_ids):
         self.user = user
         self.password = password
         self.experiment_id = experiment_id
         self.address = address
         self.parameters_ids = parameters_ids
+        self.schema = http_schema
         self.cond = Condition()
         signal.signal(signal.SIGUSR1, get_handler(self.cond))
 
@@ -36,7 +37,7 @@ class Scalarm:
         for id, param in zip(self.parameters_ids, params):
             params_dict[id] = param
         print json.dumps(params_dict)
-        r = requests.post("%s/experiments/%s/schedule_point.json" % (self.address, self.experiment_id),
+        r = requests.post("%s://%s/experiments/%s/schedule_point.json" % (self.schema, self.address, self.experiment_id),
                           auth=HTTPBasicAuth(self.user, self.password),
                           params={'point': json.dumps(params_dict)})
         print r.text
@@ -46,7 +47,7 @@ class Scalarm:
         for id, param in zip(self.parameters_ids, params):
             params_dict[id] = param
         while True:
-            r = requests.get("%s/experiments/%s/get_result.json" % (self.address, self.experiment_id),
+            r = requests.get("%s://%s/experiments/%s/get_result.json" % (self.schema, self.address, self.experiment_id),
                              auth=HTTPBasicAuth(self.user, self.password),
                              params={'point': json.dumps(params_dict)})
             print r.text
@@ -62,14 +63,9 @@ class Scalarm:
             elif decoded_result["status"] == "ok":
                 return decoded_result["result"]["product"]
 
-    def mark_as_complete(self):
-        r = requests.post("%s/experiments/%s/mark_as_complete" % (self.address, self.experiment_id),
-                          auth=HTTPBasicAuth(self.user, self.password))
-        print r.text
-
-    def set_result(self, result):
-        r = requests.post("%s/experiments/%s/set_result.json" % (self.address, self.experiment_id),
+    def mark_as_complete(self, result):
+        r = requests.post("%s://%s/experiments/%s/mark_as_complete.json" % (self.schema, self.address, self.experiment_id),
                           auth=HTTPBasicAuth(self.user, self.password),
-                          params={'result': json.dumps(result)})
+                          params={'results': json.dumps(result)})
         print r.text
 
