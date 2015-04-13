@@ -12,13 +12,14 @@ f2 = lambda x: math.e + 20 - 20 * math.exp(-0.2 * math.sqrt(0.5 * (x[0] ** 2 + x
                - math.exp(0.5 * (math.cos(2 * math.pi * x[0]) + math.cos(2 * math.pi * x[1])))
 
 
-def get_handler(cv):
+def get_handler(cond, flag_switch):
     def handler(signal, frame):
-        print 'signal receive'
+        print ('signal receive')
         sys.stdout.flush()
-        cv.acquire()
-        cv.notify()
-        cv.release()
+        cond.acquire()
+        flag_switch()
+        cond.notify()
+        cond.release()
     return handler
 
 class Scalarm:
@@ -30,17 +31,21 @@ class Scalarm:
         self.parameters_ids = parameters_ids
         self.schema = http_schema
         self.cond = Condition()
-        signal.signal(signal.SIGUSR1, get_handler(self.cond))
+        self.results_available = False
+        signal.signal(signal.SIGUSR1, get_handler(self.cond, self.set_results_available))
+
+    def set_results_available(self):
+        self.results_available = True
 
     def schedule_point(self, params):
         params_dict = {}
         for id, param in zip(self.parameters_ids, params):
             params_dict[id] = param
-        print json.dumps(params_dict)
+        print (json.dumps(params_dict))
         r = requests.post("%s://%s/experiments/%s/schedule_point.json" % (self.schema, self.address, self.experiment_id),
                           auth=HTTPBasicAuth(self.user, self.password),
                           params={'point': json.dumps(params_dict)})
-        print r.text
+        print (r.text)
 
     def get_result(self, params):
         params_dict = {}
@@ -50,14 +55,15 @@ class Scalarm:
             r = requests.get("%s://%s/experiments/%s/get_result.json" % (self.schema, self.address, self.experiment_id),
                              auth=HTTPBasicAuth(self.user, self.password),
                              params={'point': json.dumps(params_dict)})
-            print r.text
+            print (r.text)
             decoded_result = json.loads(r.text)
             if decoded_result["status"] == "error":
-                print decoded_result["message"]
+                print (decoded_result["message"])
                 sys.stdout.flush()
                 self.cond.acquire()
-                while True:
+                while not self.results_available:
                     self.cond.wait()
+                self.results_available = False
                 self.cond.release()
                 continue
             elif decoded_result["status"] == "ok":
@@ -67,5 +73,5 @@ class Scalarm:
         r = requests.post("%s://%s/experiments/%s/mark_as_complete.json" % (self.schema, self.address, self.experiment_id),
                           auth=HTTPBasicAuth(self.user, self.password),
                           params={'results': json.dumps(result)})
-        print r.text
+        print (r.text)
 
