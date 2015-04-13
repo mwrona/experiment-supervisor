@@ -2,8 +2,7 @@ import json
 import math
 import requests
 from requests.auth import HTTPBasicAuth
-from requests.exceptions import Timeout
-import time
+from threading import Condition
 import signal
 import sys
 
@@ -13,6 +12,15 @@ f2 = lambda x: math.e + 20 - 20 * math.exp(-0.2 * math.sqrt(0.5 * (x[0] ** 2 + x
                - math.exp(0.5 * (math.cos(2 * math.pi * x[0]) + math.cos(2 * math.pi * x[1])))
 
 
+def get_handler(cv):
+    def handler(signal, frame):
+        print 'signal receive'
+        sys.stdout.flush()
+        cv.acquire()
+        cv.notify()
+        cv.release()
+    return handler
+
 class Scalarm:
     def __init__(self, user, password, experiment_id, address, parameters_ids):
         self.user = user
@@ -20,7 +28,8 @@ class Scalarm:
         self.experiment_id = experiment_id
         self.address = address
         self.parameters_ids = parameters_ids
-        signal.signal(signal.SIGUSR1, lambda signal, frame: None)
+        self.cond = Condition()
+        signal.signal(signal.SIGUSR1, get_handler(self.cond))
 
     def schedule_point(self, params):
         params_dict = {}
@@ -45,7 +54,10 @@ class Scalarm:
             if decoded_result["status"] == "error":
                 print decoded_result["message"]
                 sys.stdout.flush()
-                signal.pause()
+                self.cond.acquire()
+                while True:
+                    self.cond.wait()
+                self.cond.release()
                 continue
             elif decoded_result["status"] == "ok":
                 return decoded_result["result"]["product"]
