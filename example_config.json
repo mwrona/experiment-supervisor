@@ -10,5 +10,20 @@
   "password": "",
   "http_schema": "https",
   "address" : "localhost:3001",
-  "parameters_ids" : ["c___g___x", "c___g___y"]
+  "parameters": [
+      {
+          "type": "float",
+          "id": "c___g___x",
+          "min": -3,
+          "max": 3,
+          "start_value": 0
+      },
+      {
+          "type": "int",
+          "id": "c___g___y",
+          "min": -2,
+          "max": 2,
+          "start_value": 0
+      }
+  ]
 }
