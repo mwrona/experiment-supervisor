@@ -2,7 +2,6 @@ import json
 import math
 import requests
 from requests.auth import HTTPBasicAuth
-from requests.exceptions import Timeout
 import time
 
 f1 = lambda x: (4 - 2.1 * x[0] ** 2 + (x[0] ** 4) / 3) * x[0] ** 2 + x[0] * x[1] + (-4 + 4 * x[1] ** 2) * x[1] ** 2
